@@ -1,0 +1,151 @@
+/*
+ * Toolbar popup (320px) in every theme. The page-level theme rules in themes.css and cyberpunk.css
+ * already supply the palette (CSS variables), body background, fonts and button chrome; this file
+ * adds what the popup alone has: title bar, hour counters, details link and the "open" button.
+ * There are intentionally no rules for the classic theme, so its popup is unchanged.
+ *
+ * --pp is the shell padding; the title bar bleeds out to the shell edge with negative margins.
+ * Rules ending in "#openBtn" must out-rank popup.css (which has an id selector) to restore each
+ * theme's button radius and shadow.
+ */
+
+/* ---------- Ledger: paper, serif title, tabular figures ---------- */
+body[data-theme="ledger"].popupBody { padding: 8px; }
+body[data-theme="ledger"] .popupShell { padding: 16px 18px 18px; border: 1px solid var(--line); border-top: 3px solid var(--text); background: var(--surface); }
+body[data-theme="ledger"] .popupBrand { padding-bottom: 12px; border-bottom: 1px solid var(--text); }
+body[data-theme="ledger"] .popupBrand .brandMark { border-radius: 0; }
+body[data-theme="ledger"] .popupBrand h1 { font: 400 22px/1.1 Georgia, 'Times New Roman', serif; letter-spacing: -.5px; }
+body[data-theme="ledger"] .popupSummary { margin-top: 16px; }
+body[data-theme="ledger"] .popupHours span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+body[data-theme="ledger"] .popupHours strong { font: 400 24px/1.2 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+body[data-theme="ledger"] .popupShell #openBtn { border-radius: 2px; }
+
+/* ---------- Bartek: navy title bar, system controls ---------- */
+body[data-theme="bartek"].popupBody { padding: 6px; }
+body[data-theme="bartek"] .popupShell { --pp: 12px; padding: var(--pp); border: 2px ridge #dddddd; background: #ffffff; }
+body[data-theme="bartek"] .popupBrand { margin: calc(var(--pp) * -1) calc(var(--pp) * -1) 12px; padding: 10px 12px; color: #ffffff; background: #000080; border-bottom: 2px outset #e0e0e0; }
+body[data-theme="bartek"] .popupBrand .brandMark { border: 2px outset #eeeeee; border-radius: 0; color: #000080; background: #c0c0c0; }
+body[data-theme="bartek"] .popupBrand h1 { color: #ffffff; font: bold 18px/1.1 'Times New Roman', serif; }
+body[data-theme="bartek"] .popupSummary { margin-top: 0; }
+body[data-theme="bartek"] .popupHours strong { font: bold 22px/1.2 'Times New Roman', serif; letter-spacing: 0; }
+body[data-theme="bartek"] .popupOvertime { border-left-color: #808080; }
+body[data-theme="bartek"] .popupDetails summary { color: #000080; text-decoration: underline; }
+body[data-theme="bartek"] .popupShell #openBtn { border-radius: 0; }
+
+/* ---------- Windows XP: Luna window with a blue title bar ---------- */
+body[data-theme="xp"].popupBody { padding: 8px; }
+body[data-theme="xp"] .popupShell { --pp: 12px; padding: var(--pp); border: 2px solid #0054e3; border-radius: 7px 7px 0 0; background: #ece9d8; box-shadow: 2px 3px 6px #0005; }
+body[data-theme="xp"] .popupBrand { margin: calc(var(--pp) * -1) calc(var(--pp) * -1) 12px; padding: 8px 10px; color: #ffffff; background: linear-gradient(#4590ff 0, #0864e8 7px, #0755cb 90%, #0044a8); border-radius: 5px 5px 0 0; }
+body[data-theme="xp"] .popupBrand .brandMark { border-radius: 3px; color: #6b3f00; background: linear-gradient(#ffe38a, #e9a42a); box-shadow: inset 1px 1px #ffffff99; }
+body[data-theme="xp"] .popupBrand h1 { color: #ffffff; font: bold 16px/1.15 'Trebuchet MS', Tahoma, sans-serif; text-shadow: 1px 1px #003b9b; }
+body[data-theme="xp"] .popupSummary { margin-top: 0; padding: 10px 12px; border: 1px solid #7f9db9; background: #ffffff; }
+body[data-theme="xp"] .popupShell #openBtn { border-radius: 3px; box-shadow: inset 1px 1px #ffffff; }
+body[data-theme="xp"] .popupShell #openBtn:hover { box-shadow: inset 0 0 0 2px #edc45b; }
+body[data-theme="xp"] .popupShell #openBtn:active { box-shadow: inset 1px 1px 2px #8d8e81; }
+
+/* ---------- Minecraft: stone inventory window with a grass header ---------- */
+body[data-theme="minecraft"].popupBody { padding: 10px 14px 14px 10px; }
+body[data-theme="minecraft"] .popupShell { --pp: 12px; padding: var(--pp); border: 3px solid #2b2d26; background: #dedbd1; box-shadow: inset 3px 3px #f5f2e6, inset -3px -3px #8c8b80, 4px 4px #201b16; }
+body[data-theme="minecraft"] .popupBrand { margin: calc(var(--pp) * -1) calc(var(--pp) * -1) 12px; padding: 10px 12px; color: #ffffff; background: #3f6029; border-bottom: 3px solid #272c20; box-shadow: inset 3px 3px #71944e, inset -3px -3px #243d19; }
+body[data-theme="minecraft"] .popupBrand .brandMark { border: 2px solid #24241f; border-radius: 0; color: #ffffff; background: #85877c; text-shadow: 1px 2px #34362f; box-shadow: inset 2px 2px #bfc2b2, inset -2px -2px #4e5046; }
+body[data-theme="minecraft"] .popupBrand h1 { color: #ffffff; font: bold 17px/1.2 'Lucida Console', Monaco, Consolas, monospace; letter-spacing: -1px; text-shadow: 2px 2px #1b2d12; }
+body[data-theme="minecraft"] .popupSummary { margin-top: 0; }
+body[data-theme="minecraft"] .popupHours strong { font: bold 22px/1.2 'Lucida Console', Monaco, Consolas, monospace; letter-spacing: -1px; }
+body[data-theme="minecraft"] .popupOvertime { border-left: 2px solid #57584e; }
+body[data-theme="minecraft"] .popupShell #openBtn { border-radius: 0; box-shadow: inset 2px 2px #bfc2b2, inset -2px -2px #4e5046; }
+body[data-theme="minecraft"] .popupShell #openBtn:hover { box-shadow: inset 2px 2px #bacd9f, inset -2px -2px #465335; }
+body[data-theme="minecraft"] .popupShell #openBtn:active { box-shadow: inset 2px 2px #465335, inset -2px -2px #bacd9f; }
+
+/* ---------- Audiofil: brushed metal bar and amber instrument readouts ---------- */
+body[data-theme="audiophile"].popupBody { padding: 8px; }
+body[data-theme="audiophile"] .popupShell { --pp: 14px; padding: var(--pp); border: 1px solid #5c5d55; border-top: 3px solid #8e8b7b; border-radius: 3px; background: var(--surface); box-shadow: 0 5px 14px #0007; }
+body[data-theme="audiophile"] .popupBrand { margin: calc(var(--pp) * -1) calc(var(--pp) * -1) 14px; padding: 12px 14px; background: repeating-linear-gradient(0deg, #ffffff03 0 1px, #00000003 1px 3px), linear-gradient(#3e403b, #292b28); border-bottom: 1px solid #5c5d55; box-shadow: inset 0 1px #a09c7b66; }
+body[data-theme="audiophile"] .popupBrand .brandMark { border-radius: 2px; color: #201b12; background: linear-gradient(#dfbf80, #b68e4e); }
+body[data-theme="audiophile"] .popupBrand h1 { font-size: 17px; font-weight: 400; letter-spacing: 1px; }
+body[data-theme="audiophile"] .popupSummary { margin-top: 0; }
+body[data-theme="audiophile"] .popupHours { gap: 8px; }
+body[data-theme="audiophile"] .popupHours > div { padding: 8px 10px; border: 1px solid #565949; border-radius: 2px; background: #101711; box-shadow: inset 0 2px 5px #000; }
+body[data-theme="audiophile"] .popupHours .popupOvertime { border: 1px solid #565949; padding: 8px 10px; }
+body[data-theme="audiophile"] .popupHours span { color: #a6ad91; font-size: 10px; }
+body[data-theme="audiophile"] .popupHours strong { color: #eac278; font: 22px/1.2 'SFMono-Regular', Consolas, monospace; letter-spacing: 0; font-variant-numeric: tabular-nums; text-shadow: 0 0 8px #e5b46144; }
+body[data-theme="audiophile"] .popupHours .popupOvertime strong { color: #c9b2ff; text-shadow: 0 0 8px #b79cff44; }
+body[data-theme="audiophile"] .popupDetails summary { color: #edc781; }
+body[data-theme="audiophile"] .popupShell #openBtn { border-radius: 3px; box-shadow: inset 0 1px #ffffff18, 0 2px 2px #0004; }
+
+/* ---------- macOS: frosted card and a dock-style icon ---------- */
+body[data-theme="macos"].popupBody { padding: 10px; }
+body[data-theme="macos"] .popupShell { padding: 16px; border: 1px solid #ffffffbd; border-radius: 14px; background: var(--surface); box-shadow: 0 0 0 1px #283d5c0d, var(--shadow); }
+body[data-theme="macos"] .popupBrand .brandMark { border-radius: 8px; background: linear-gradient(#6ba6ff, #3067db); box-shadow: inset 0 1px 1px #ffffff80, 0 3px 5px #263e7533; }
+body[data-theme="macos"] .popupBrand h1 { font-weight: 600; }
+body[data-theme="macos"] .popupShell #openBtn { border-radius: 9px; background: linear-gradient(#6ba6ff, #3067db); box-shadow: inset 0 1px 1px #ffffff66; }
+
+/* ---------- Żółta platforma: black, charcoal and an orange label ---------- */
+body[data-theme="yellow"].popupBody { padding: 8px; }
+body[data-theme="yellow"] .popupShell { padding: 14px; border: 1px solid #3b3b3b; border-bottom: 2px solid #ff9900; border-radius: 4px; background: var(--surface); }
+body[data-theme="yellow"] .popupBrand .brandMark { border: 1px solid #ff9900; border-radius: 4px; color: #ff9900; background: #242424; }
+body[data-theme="yellow"] .popupBrand h1 { padding: 3px 8px; font-size: 17px; letter-spacing: -.5px; }
+body[data-theme="yellow"] .popupHours strong { color: #ff9900; }
+body[data-theme="yellow"] .popupHours .popupOvertime strong { color: #d7b8ff; }
+body[data-theme="yellow"] .popupDetails summary { color: #ffad33; }
+body[data-theme="yellow"] .popupShell #openBtn { border-radius: 4px; }
+
+/* ---------- Cyberpunk 2077: chamfered panel, glitch title, neon figures ---------- */
+body[data-theme="cyberpunk"].popupBody { padding: 10px; }
+body[data-theme="cyberpunk"] .popupShell {
+  position: relative;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(25, 227, 255, .035), transparent 120px), var(--surface);
+  box-shadow: inset 0 1px 0 rgba(252, 238, 9, .18);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+body[data-theme="cyberpunk"] .popupShell::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent calc(50% - 1px), var(--cp-yellow) calc(50% - 1px), var(--cp-yellow) calc(50% + 1px), transparent calc(50% + 1px));
+  opacity: .75;
+}
+body[data-theme="cyberpunk"] .popupBrand { position: relative; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+body[data-theme="cyberpunk"] .popupBrand::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 72px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cp-yellow) 0 70%, var(--cp-red) 70%);
+  box-shadow: 0 0 12px rgba(252, 238, 9, .55);
+}
+body[data-theme="cyberpunk"] .popupBrand .brandMark {
+  border-radius: 0;
+  color: #070707;
+  background: var(--cp-yellow);
+  font-weight: 800;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+body[data-theme="cyberpunk"] .popupBrand h1 {
+  display: inline-block;
+  color: var(--cp-yellow);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-shadow: 1px 0 rgba(255, 42, 77, .55), -1px 0 rgba(25, 227, 255, .55), 0 0 14px rgba(252, 238, 9, .22);
+  animation: cpGlitch 9s infinite;
+}
+body[data-theme="cyberpunk"] .popupSummary { margin-top: 18px; }
+body[data-theme="cyberpunk"] .popupHours span { font-family: var(--cp-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+body[data-theme="cyberpunk"] .popupHours strong { font-family: var(--cp-mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+body[data-theme="cyberpunk"] .popupHours .popupDeclared strong { color: var(--cp-yellow); text-shadow: 0 0 14px rgba(252, 238, 9, .38); }
+body[data-theme="cyberpunk"] .popupHours .popupOvertime strong { color: var(--chart-over-target); text-shadow: 0 0 12px color-mix(in srgb, var(--cp-violet) 55%, transparent); }
+body[data-theme="cyberpunk"] .popupPeriod { font-family: var(--cp-mono); font-size: 12px; letter-spacing: .04em; }
+body[data-theme="cyberpunk"] .popupDetails summary { color: var(--cp-cyan); }
+body[data-theme="cyberpunk"] .popupShell #openBtn { border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme="cyberpunk"] .popupBrand h1 { animation: none; }
+}

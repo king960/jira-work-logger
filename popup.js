@@ -1,6 +1,7 @@
 import { formatDateRange } from './date-range.js';
 import { fmtHHMM } from './api.js';
 import { totalOvertime } from './time-metrics.js';
+import { normalizeTheme, cacheTheme } from './theme-settings.js';
 import { loadReminderSettings, isReminderSettingKey, analyzeCompletion } from "./reminders.js";
 
 async function renderLastSummary() {
@@ -36,12 +37,29 @@ async function renderLastSummary() {
   }
 }
 
+function applyTheme(value) {
+  const theme = normalizeTheme(value);
+  document.body.dataset.theme = theme;
+  cacheTheme(theme);
+}
+
+async function loadTheme() {
+  try {
+    const { theme } = await chrome.storage.sync.get("theme");
+    applyTheme(theme);
+  } catch (error) {
+    console.warn(error);
+  }
+}
+
 chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "sync" && changes.theme) applyTheme(changes.theme.newValue);
   if ((area === "local" && (changes.lastResult || changes.lastResultSavedAt)) ||
       (area === "sync" && Object.keys(changes).some(isReminderSettingKey))) {
     void renderLastSummary();
   }
 });
+void loadTheme();
 void renderLastSummary();
 
 document.getElementById("openBtn").addEventListener("click", async () => {

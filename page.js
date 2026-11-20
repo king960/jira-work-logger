@@ -1,4 +1,5 @@
 import { installTeamView } from './team-view.js';
+import { normalizeTheme, cacheTheme } from './theme-settings.js';
 import { dailyWorkLimit, dailyOvertime } from './time-metrics.js';
 import { setLoadingWave } from './loading-wave.js';
 import { installWorkspaceUX } from './workspace-ux.js';
@@ -334,9 +335,10 @@ async function saveSettings() {
 }
 
 function applyTheme(value) {
-  const theme = ["classic", "ledger", "bartek", "xp", "minecraft", "audiophile", "macos", "yellow"].includes(value) ? value : "classic";
+  const theme = normalizeTheme(value);
   document.body.dataset.theme = theme;
   $("themeSelect").value = theme;
+  cacheTheme(theme);
 }
 
 $("jiraPanelEnabled").addEventListener("change", async (event) => {

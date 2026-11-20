@@ -1,0 +1,820 @@
+/*
+ * Cyberpunk 2077 — Night City: near-black glass, Arasaka yellow, Militech cyan, neon glow.
+ *
+ * State semantics are identical to the classic look, only recoloured:
+ *   done      → green      (isDone, meter, "BRAK nadgodzin")
+ *   short     → orange     (isShort, missing hours, attention strip)
+ *   future    → grey line  (isFuture)
+ *   free      → dimmed grey hatched row (holiday / day off — isFree)
+ *   vacation  → violet     (isVacation, "U" badge on the chart)
+ *   overtime  → violet stripes (same token as the classic chart)
+ * Effects are decorative only (pointer-events: none) and are switched off for reduced motion.
+ */
+
+body[data-theme="cyberpunk"] {
+  color-scheme: dark;
+  --cp-yellow: #fcee09;
+  --cp-cyan: #19e3ff;
+  --cp-red: #ff2a4d;
+  --cp-violet: #b45cff;
+  --cp-grey: #4b4d63;
+  --cp-mono: 'Cascadia Mono', Consolas, 'SFMono-Regular', 'Liberation Mono', monospace;
+
+  --bg: #06060b;
+  --surface: #0f0f18;
+  --surface-soft: #171724;
+  --text: #e9e9f2;
+  --muted: #8e91a8;
+  --line: #2b2c3f;
+  --primary: #fcee09;
+  --primary-dark: #fff56a;
+  --primary-soft: #2b2807;
+  --success: #34f5a0;
+  --success-soft: #0b2b20;
+  --warn: #ff8a3d;
+  --warn-soft: #2f1b0d;
+  --warn-line: #7d431c;
+  --chart-bar: #19e3ff;
+  --chart-bar-short: #ff6f1f;
+  --chart-grid: #232438;
+  --chart-rule: #fcee09;
+  --chart-over-target: #b45cff;
+  --chart-over-target-stripe: #efd6ff;
+  --shadow: none;
+
+  background:
+    radial-gradient(1100px 520px at 6% -10%, rgba(255, 42, 77, .11), transparent 62%),
+    radial-gradient(900px 520px at 100% 0%, rgba(25, 227, 255, .10), transparent 62%),
+    linear-gradient(rgba(252, 238, 9, .028) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgba(252, 238, 9, .028) 1px, transparent 1px) 0 0 / 48px 48px,
+    #06060b;
+  background-attachment: fixed;
+  font-family: Bahnschrift, 'DIN Alternate', 'Segoe UI', system-ui, sans-serif;
+  scrollbar-color: rgba(252, 238, 9, .55) #0b0b12;
+  scrollbar-width: thin;
+}
+
+:root:has(body[data-theme="cyberpunk"]) {
+  scrollbar-color: rgba(252, 238, 9, .55) #0b0b12;
+  scrollbar-width: thin;
+}
+
+body[data-theme="cyberpunk"] ::selection {
+  background: var(--cp-yellow);
+  color: #050505;
+}
+
+/* ---------- Atmosphere: faint scanlines and one slow scanning beam ---------- */
+body[data-theme="cyberpunk"]::before,
+body[data-theme="cyberpunk"]::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+body[data-theme="cyberpunk"]::before {
+  top: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .022) 0 1px, transparent 1px 3px);
+}
+
+body[data-theme="cyberpunk"]::after {
+  top: -180px;
+  height: 180px;
+  background: linear-gradient(transparent, rgba(25, 227, 255, .055), transparent);
+  animation: cpBeam 11s linear infinite;
+}
+
+@keyframes cpBeam {
+  from { translate: 0 0; }
+  to { translate: 0 calc(100vh + 360px); }
+}
+
+/* ---------- Typography ---------- */
+body[data-theme="cyberpunk"] :is(h1, h2, th, .eyebrow, .tabBtn) {
+  text-transform: uppercase;
+}
+
+body[data-theme="cyberpunk"] .appHeader h1 {
+  display: inline-block;
+  color: var(--cp-yellow);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-shadow: 1px 0 rgba(255, 42, 77, .55), -1px 0 rgba(25, 227, 255, .55), 0 0 18px rgba(252, 238, 9, .22);
+  animation: cpGlitch 9s infinite;
+}
+
+@keyframes cpGlitch {
+  0%, 91%, 100% {
+    transform: none;
+    text-shadow: 1px 0 rgba(255, 42, 77, .55), -1px 0 rgba(25, 227, 255, .55), 0 0 18px rgba(252, 238, 9, .22);
+  }
+  93% {
+    transform: translateX(2px) skewX(-6deg);
+    text-shadow: 4px 0 rgba(255, 42, 77, .85), -4px 0 rgba(25, 227, 255, .85), 0 0 18px rgba(252, 238, 9, .3);
+  }
+  95% {
+    transform: translateX(-2px) skewX(4deg);
+    text-shadow: -3px 0 rgba(255, 42, 77, .85), 3px 0 rgba(25, 227, 255, .85), 0 0 18px rgba(252, 238, 9, .3);
+  }
+  97% {
+    transform: translateX(1px);
+    text-shadow: 2px 0 rgba(255, 42, 77, .6), -2px 0 rgba(25, 227, 255, .6), 0 0 18px rgba(252, 238, 9, .22);
+  }
+}
+
+body[data-theme="cyberpunk"] .eyebrow {
+  color: var(--cp-cyan);
+  font-family: var(--cp-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .2em;
+}
+
+body[data-theme="cyberpunk"] .eyebrow::before {
+  content: '// ';
+  color: var(--cp-red);
+}
+
+body[data-theme="cyberpunk"] h2 {
+  letter-spacing: .09em;
+}
+
+body[data-theme="cyberpunk"] :is(.balanceStat strong, .dayNumbers, .dayWorklogTime, .summaryRow strong, .stepperValue) {
+  font-family: var(--cp-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Header ---------- */
+body[data-theme="cyberpunk"] .appHeader {
+  position: relative;
+  padding-bottom: 22px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+body[data-theme="cyberpunk"] .appHeader::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 132px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cp-yellow) 0 70%, var(--cp-red) 70%);
+  box-shadow: 0 0 14px rgba(252, 238, 9, .55);
+}
+
+body[data-theme="cyberpunk"] .periodTimeValues .declaredStat strong {
+  color: var(--cp-yellow);
+  text-shadow: 0 0 16px rgba(252, 238, 9, .38);
+}
+
+body[data-theme="cyberpunk"] .periodTimeValues .overtimeStat {
+  border-radius: 2px;
+}
+
+body[data-theme="cyberpunk"] .periodTimeValues .overtimeStat.hasOvertime strong {
+  text-shadow: 0 0 12px color-mix(in srgb, var(--cp-violet) 60%, transparent);
+}
+
+body[data-theme="cyberpunk"] .periodTimeProgress {
+  border-radius: 0;
+  background: #1c1d2c;
+}
+
+body[data-theme="cyberpunk"] .periodTimeProgress > span {
+  border-radius: 0;
+  background: linear-gradient(90deg, #ffb800, var(--cp-yellow));
+  box-shadow: 0 0 10px rgba(252, 238, 9, .6);
+  transition: width .7s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* ---------- Tabs ---------- */
+body[data-theme="cyberpunk"] .tabs .tabBtn {
+  position: relative;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  transition: color .15s ease, box-shadow .2s ease;
+}
+
+body[data-theme="cyberpunk"] .tabs .tabBtn:hover {
+  color: var(--text);
+  transform: none;
+  box-shadow: inset 0 -2px 0 rgba(25, 227, 255, .55);
+}
+
+body[data-theme="cyberpunk"] .tabs .tabBtn.isActive {
+  color: var(--cp-yellow);
+  border-bottom-color: var(--cp-yellow);
+  text-shadow: 0 0 12px rgba(252, 238, 9, .5);
+  box-shadow: 0 6px 14px -8px rgba(252, 238, 9, .75);
+}
+
+/* ---------- Panels: chamfered corner with a neon edge ---------- */
+body[data-theme="cyberpunk"] .panel {
+  position: relative;
+  border-color: var(--line);
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(25, 227, 255, .035), transparent 120px), var(--surface);
+  box-shadow: inset 0 1px 0 rgba(252, 238, 9, .18);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+
+body[data-theme="cyberpunk"] .panel::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent calc(50% - 1px), var(--cp-yellow) calc(50% - 1px), var(--cp-yellow) calc(50% + 1px), transparent calc(50% + 1px));
+  opacity: .75;
+}
+
+body[data-theme="cyberpunk"] .tabView.isActive {
+  animation: cpViewEnter .28s ease-out both;
+}
+
+@keyframes cpViewEnter {
+  from { opacity: 0; translate: 0 8px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+body[data-theme="cyberpunk"] :is(.chartFigure, .reminderCard, .meetingRow, .meetingsSummary, .rangeNotice,
+  .mono, .mutedAction, .teamAdd, .inlineDayEditor, .inlineDayRow, .worklogProposal, .localAIStatus,
+  .attentionStrip, .dayEmpty, .bartekMetrics span, .teamPerson, .statusPill) {
+  border-radius: 2px;
+}
+
+body[data-theme="cyberpunk"] .attentionStrip {
+  border-left-width: 3px;
+}
+
+body[data-theme="cyberpunk"] .statusPill {
+  border-color: rgba(252, 238, 9, .3);
+  font-family: var(--cp-mono);
+  font-size: 11px;
+}
+
+/* ---------- Buttons ---------- */
+body[data-theme="cyberpunk"] button {
+  border-radius: 2px;
+  letter-spacing: .02em;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+body[data-theme="cyberpunk"] button:hover {
+  transform: none;
+}
+
+body[data-theme="cyberpunk"] button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+body[data-theme="cyberpunk"] :is(.primaryBtn, .secondaryBtn, .dangerBtn) {
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%);
+}
+
+body[data-theme="cyberpunk"] .primaryBtn {
+  border: 0;
+  color: #070707;
+  background: var(--cp-yellow);
+  box-shadow: none;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-theme="cyberpunk"] .primaryBtn:hover:not(:disabled) {
+  background: #fff75e;
+}
+
+body[data-theme="cyberpunk"] .primaryBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .6) 50%, transparent 65%);
+  transform: translateX(-130%);
+  transition: transform .6s ease;
+}
+
+body[data-theme="cyberpunk"] .primaryBtn:hover:not(:disabled)::after {
+  transform: translateX(130%);
+}
+
+body[data-theme="cyberpunk"] .secondaryBtn {
+  border: 1px solid #34364b;
+  color: var(--text);
+  background: var(--surface-soft);
+}
+
+body[data-theme="cyberpunk"] .secondaryBtn:hover:not(:disabled) {
+  border-color: var(--cp-cyan);
+  color: var(--cp-cyan);
+  background: #121a26;
+}
+
+body[data-theme="cyberpunk"] .dangerBtn {
+  border: 0;
+  color: #fff;
+  background: var(--cp-red);
+}
+
+body[data-theme="cyberpunk"] .dangerBtn:hover {
+  background: #ff5470;
+}
+
+body[data-theme="cyberpunk"] .textButton {
+  color: var(--cp-cyan);
+}
+
+body[data-theme="cyberpunk"] .stepper button,
+body[data-theme="cyberpunk"] td:last-child button,
+body[data-theme="cyberpunk"] .dayWorklog button,
+body[data-theme="cyberpunk"] .bartekDay button {
+  color: var(--cp-yellow);
+  background: var(--primary-soft);
+}
+
+body[data-theme="cyberpunk"] .dayWorklog .worklogRowActions button {
+  color: var(--muted);
+  background: transparent;
+}
+
+body[data-theme="cyberpunk"] .dayWorklog .worklogRowActions .editIconBtn:hover {
+  color: var(--cp-yellow);
+  background: var(--primary-soft);
+}
+
+body[data-theme="cyberpunk"] :is(.dayWorklog .deleteWorklogBtn, td:last-child .deleteWorklogBtn) {
+  color: #ff5470;
+}
+
+body[data-theme="cyberpunk"] .dayWorklog .worklogRowActions .deleteWorklogBtn:hover {
+  color: #ff5470;
+  background: rgba(255, 42, 77, .14);
+}
+
+body[data-theme="cyberpunk"] .segmentedControl {
+  border-radius: 2px;
+  background: #0a0a12;
+}
+
+body[data-theme="cyberpunk"] .segmentedControl button[aria-pressed="true"] {
+  color: #070707;
+  background: var(--cp-yellow);
+  box-shadow: none;
+}
+
+body[data-theme="cyberpunk"] .chartInfoButton:hover,
+body[data-theme="cyberpunk"] .chartInfoButton:focus-visible {
+  color: var(--cp-cyan);
+  background: rgba(25, 227, 255, .1);
+}
+
+/* ---------- Form fields ---------- */
+body[data-theme="cyberpunk"] :is(input, textarea, select) {
+  border: 1px solid #34364b;
+  border-radius: 2px;
+  color: var(--text);
+  background: #0a0a12;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+body[data-theme="cyberpunk"] select {
+  font: inherit;
+}
+
+body[data-theme="cyberpunk"] fieldset {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+
+body[data-theme="cyberpunk"] legend {
+  color: var(--cp-cyan);
+}
+
+body[data-theme="cyberpunk"] :is(input, textarea)::placeholder {
+  color: #5e6179;
+}
+
+body[data-theme="cyberpunk"] :is(input, textarea, select):hover {
+  border-color: #4a4d68;
+}
+
+body[data-theme="cyberpunk"] :is(input, textarea, select):focus {
+  border-color: var(--cp-cyan);
+  box-shadow: 0 0 0 1px rgba(25, 227, 255, .45), 0 0 14px -3px rgba(25, 227, 255, .55);
+}
+
+body[data-theme="cyberpunk"] :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--cp-yellow);
+}
+
+body[data-theme="cyberpunk"] .field,
+body[data-theme="cyberpunk"] .toggleField,
+body[data-theme="cyberpunk"] .mono {
+  color: var(--text);
+}
+
+body[data-theme="cyberpunk"] .field {
+  font-size: 11px;
+  letter-spacing: .06em;
+}
+
+body[data-theme="cyberpunk"] :is(button, input, textarea, select, a, summary):focus-visible {
+  outline: 2px solid var(--cp-cyan);
+  outline-offset: 2px;
+}
+
+body[data-theme="cyberpunk"] :is(.primaryBtn, .secondaryBtn, .dangerBtn):focus-visible {
+  outline-offset: -3px;
+}
+
+body[data-theme="cyberpunk"] .ticketLink {
+  color: var(--cp-cyan);
+}
+
+/* ---------- Day cards: state colour comes from --cp-state ---------- */
+body[data-theme="cyberpunk"] .dayCard {
+  --cp-state: var(--cp-grey);
+  position: relative;
+  border-color: var(--line);
+  border-left-color: var(--cp-state);
+  border-radius: 2px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--cp-state) 10%, transparent), transparent 38%),
+    var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03), inset 12px 0 18px -16px var(--cp-state);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+body[data-theme="cyberpunk"] .dayCard:hover {
+  border-color: color-mix(in srgb, var(--cp-state) 40%, var(--line));
+  border-left-color: var(--cp-state);
+}
+
+body[data-theme="cyberpunk"] .dayCard.isDone { --cp-state: var(--success); }
+body[data-theme="cyberpunk"] .dayCard.isShort { --cp-state: var(--chart-bar-short); }
+body[data-theme="cyberpunk"] .dayCard.isFuture { --cp-state: #5a5d78; }
+body[data-theme="cyberpunk"] .dayCard.isFree { --cp-state: var(--cp-grey); }
+body[data-theme="cyberpunk"] .dayCard.isVacation { --cp-state: var(--cp-violet); }
+
+/* Holiday / day off / vacation: visibly greyed out, hatched like a closed zone. */
+body[data-theme="cyberpunk"] .dayCard.isFree {
+  border-color: #1f202d;
+  border-left-color: var(--cp-state);
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .028) 0 6px, transparent 6px 12px),
+    #09090f;
+  box-shadow: none;
+}
+
+body[data-theme="cyberpunk"] .dayCard.isFree :is(.dayExpand, .dayWhen strong, .dayDeclared > strong, .dayChevron) {
+  color: var(--muted);
+}
+
+body[data-theme="cyberpunk"] .dayCard.isFree .meterFill {
+  background: var(--cp-grey);
+}
+
+body[data-theme="cyberpunk"] .daysList > .dayCard::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent 50%, var(--cp-state) 50%);
+  opacity: .85;
+}
+
+body[data-theme="cyberpunk"] .dayCard.isFocused {
+  box-shadow: inset 0 0 0 1px var(--cp-yellow), 0 0 24px -6px rgba(252, 238, 9, .6);
+  animation: cpFocusPulse 1.6s ease-out;
+}
+
+@keyframes cpFocusPulse {
+  0% { box-shadow: inset 0 0 0 1px var(--cp-yellow), 0 0 34px 2px rgba(252, 238, 9, .75); }
+  100% { box-shadow: inset 0 0 0 1px var(--cp-yellow), 0 0 24px -6px rgba(252, 238, 9, .6); }
+}
+
+body[data-theme="cyberpunk"] .holidayBadge {
+  border-radius: 2px;
+  font-family: var(--cp-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* Hours meter: segmented like a health bar, grows in when the list is drawn. */
+body[data-theme="cyberpunk"] .meterTrack {
+  height: 6px;
+  border-radius: 0;
+  background: #1a1b2a;
+}
+
+body[data-theme="cyberpunk"] .dayMeter .meterTrack {
+  height: 6px;
+}
+
+body[data-theme="cyberpunk"] .meterFill {
+  border-radius: 0;
+  transform-origin: left center;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, .5) 7px 9px),
+    var(--chart-bar);
+  animation: cpMeterIn .7s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+body[data-theme="cyberpunk"] .isShort .meterFill {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, .5) 7px 9px),
+    var(--chart-bar-short);
+}
+
+body[data-theme="cyberpunk"] .isDone .meterFill {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, .5) 7px 9px),
+    var(--success);
+}
+
+body[data-theme="cyberpunk"] .dayCard.isFuture .meterFill {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, .5) 7px 9px),
+    #3d4058;
+}
+
+body[data-theme="cyberpunk"] .dayCard.isFree .meterFill {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, .5) 7px 9px),
+    var(--cp-grey);
+}
+
+@keyframes cpMeterIn {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+body[data-theme="cyberpunk"] .dayDelta {
+  border-radius: 2px;
+  background: var(--surface-soft);
+}
+
+body[data-theme="cyberpunk"] .dayNumbers .dayDelta:is(.isOvertime, .isNoOvertime) {
+  border-radius: 2px;
+}
+
+/* ---------- Worklog rows ---------- */
+body[data-theme="cyberpunk"] .dayWorklogs {
+  border-radius: 2px;
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+body[data-theme="cyberpunk"] .dayWorklog {
+  transition: background .15s ease, box-shadow .15s ease;
+}
+
+body[data-theme="cyberpunk"] .dayWorklog:hover,
+body[data-theme="cyberpunk"] .dayWorklog:focus-within {
+  background: #14141f;
+  box-shadow: inset 2px 0 0 var(--cp-cyan);
+}
+
+body[data-theme="cyberpunk"] .dayWorklogTime {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--cp-cyan);
+  background: #0a0a12;
+}
+
+body[data-theme="cyberpunk"] .dayWorklogTime svg {
+  color: var(--cp-cyan);
+  opacity: .7;
+}
+
+body[data-theme="cyberpunk"] .dayEmpty {
+  border-color: #34364b;
+}
+
+body[data-theme="cyberpunk"] .localAISummary.isGenerating {
+  border-inline-start: 0;
+  background: color-mix(in srgb, var(--cp-yellow) 5%, var(--surface));
+  box-shadow: inset 3px 0 0 var(--cp-yellow);
+}
+
+/* Epics and issue types: same meaning, readable on a dark surface. */
+body[data-theme="cyberpunk"] .dayWorklogEpic,
+body[data-theme="cyberpunk"] #addWorklogDlg .issueResultEpic {
+  border-color: color-mix(in srgb, var(--cp-violet) 38%, transparent);
+  border-radius: 2px;
+  color: #cfa8ff;
+  background: color-mix(in srgb, var(--cp-violet) 16%, var(--surface));
+}
+
+body[data-theme="cyberpunk"] .issueTypeIcon {
+  border-radius: 2px;
+  background: #0e2536;
+  color: #4cc3ff;
+}
+
+body[data-theme="cyberpunk"] .issueTypeIcon--story { background: #0c2b21; color: var(--success); }
+body[data-theme="cyberpunk"] .issueTypeIcon--bug { background: #34121c; color: #ff5470; }
+body[data-theme="cyberpunk"] .issueTypeIcon--epic { background: #261443; color: #cfa8ff; }
+
+/* ---------- Tables ---------- */
+body[data-theme="cyberpunk"] th {
+  color: var(--cp-cyan);
+  background: #12121d;
+  letter-spacing: .1em;
+}
+
+body[data-theme="cyberpunk"] td {
+  border-bottom-color: #1f2032;
+}
+
+body[data-theme="cyberpunk"] tbody tr:hover {
+  background: #14141f;
+}
+
+body[data-theme="cyberpunk"] .mutedAction {
+  background: var(--surface-soft);
+}
+
+/* ---------- Chart: neon bars, same colour roles ---------- */
+body[data-theme="cyberpunk"] .chartFigure {
+  background: var(--surface);
+}
+
+body[data-theme="cyberpunk"] .chartBar.isEmpty { fill: #34364e; }
+body[data-theme="cyberpunk"] .chartBar.isFree { fill: #6a6e8d; }
+
+body[data-theme="cyberpunk"] #weeklyChart .chartBar.chartEmptyOutline,
+body[data-theme="cyberpunk"] #weeklyChart .chartMissingFill,
+body[data-theme="cyberpunk"] #weeklyChart .chartHolidayFill {
+  fill: #202032;
+}
+
+body[data-theme="cyberpunk"] #weeklyChart .chartEmptyOutline:hover {
+  fill: #2a2a42;
+}
+
+body[data-theme="cyberpunk"] #weeklyChart g[clip-path] text {
+  fill: #6a6d8c;
+}
+
+body[data-theme="cyberpunk"] #weeklyChart g[clip-path] path {
+  stroke: #6a6d8c;
+}
+
+body[data-theme="cyberpunk"] .chartBar.isDone { filter: drop-shadow(0 0 4px rgba(25, 227, 255, .45)); }
+body[data-theme="cyberpunk"] .chartBar.isShort { filter: drop-shadow(0 0 4px rgba(255, 111, 31, .45)); }
+
+body[data-theme="cyberpunk"] .chartBar:hover {
+  fill-opacity: 1;
+  filter: brightness(1.25) drop-shadow(0 0 6px currentColor);
+}
+
+body[data-theme="cyberpunk"] .chartRule {
+  stroke-opacity: .7;
+  stroke-width: 1.5;
+  stroke-dasharray: 7 4;
+}
+
+body[data-theme="cyberpunk"] .chartVacationBadge,
+body[data-theme="cyberpunk"] .chartBar.isVacation {
+  fill: #9b4dff;
+}
+
+body[data-theme="cyberpunk"] .chartDayNum {
+  fill: var(--text);
+}
+
+body[data-theme="cyberpunk"] #chartCaption {
+  border-color: rgba(25, 227, 255, .35);
+  border-radius: 2px;
+  background: #0b0b14;
+  box-shadow: 0 0 22px -6px rgba(25, 227, 255, .5);
+}
+
+body[data-theme="cyberpunk"] .teamChartBar { fill: var(--chart-bar); }
+body[data-theme="cyberpunk"] .teamChartBar.isShort { fill: var(--chart-bar-short); }
+body[data-theme="cyberpunk"] .teamGap { color: #ff6b7f; background: #331519; }
+body[data-theme="cyberpunk"] .teamOk { color: var(--success); background: var(--success-soft); }
+body[data-theme="cyberpunk"] :is(.teamGap, .teamOk, .teamUnknown) { border-radius: 2px; }
+
+/* ---------- Dialogs, drawer, toasts ---------- */
+body[data-theme="cyberpunk"] dialog {
+  border: 1px solid #34364b;
+  border-radius: 2px;
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: 0 0 40px -10px rgba(25, 227, 255, .3), 0 24px 70px #000b;
+}
+
+body[data-theme="cyberpunk"] dialog::backdrop,
+body[data-theme="cyberpunk"] #addWorklogDlg::backdrop {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .02) 0 1px, transparent 1px 3px),
+    rgba(4, 4, 9, .72);
+  backdrop-filter: blur(3px);
+}
+
+body[data-theme="cyberpunk"] #addWorklogDlg.worklogDrawer {
+  border: 0;
+  border-left: 1px solid rgba(252, 238, 9, .55);
+  border-radius: 0;
+  box-shadow: -14px 0 50px -12px rgba(252, 238, 9, .22);
+}
+
+body[data-theme="cyberpunk"] #addWorklogDlg.worklogDrawer[open] {
+  animation: cpDrawerIn .26s cubic-bezier(.2, .8, .2, 1);
+}
+
+@keyframes cpDrawerIn {
+  from { translate: 36px 0; opacity: 0; }
+  to { translate: 0 0; opacity: 1; }
+}
+
+body[data-theme="cyberpunk"] .drawerTickets {
+  background: #0b0b13;
+}
+
+body[data-theme="cyberpunk"] .appPrompt[open] {
+  animation: cpPromptIn .2s ease-out;
+}
+
+@keyframes cpPromptIn {
+  from { scale: .97; opacity: 0; }
+  to { scale: 1; opacity: 1; }
+}
+
+body[data-theme="cyberpunk"] .workspaceToast {
+  border-radius: 2px;
+  border-color: var(--line);
+  border-left-color: var(--success);
+  box-shadow: 0 0 26px -8px rgba(52, 245, 160, .5), 0 8px 24px #000a;
+  animation: cpToastIn .24s ease-out;
+}
+
+@keyframes cpToastIn {
+  from { opacity: 0; translate: 0 10px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+body[data-theme="cyberpunk"] .fetchActivity {
+  border-bottom-color: rgba(252, 238, 9, .5);
+  box-shadow: 0 4px 24px -6px rgba(252, 238, 9, .35);
+}
+
+body[data-theme="cyberpunk"] .fetchActivityTrack {
+  background: var(--primary-soft);
+}
+
+/* Data-loading shimmer takes the Militech cyan. */
+body[data-theme="cyberpunk"] #worklogLoadingGradient stop {
+  stop-color: var(--cp-cyan);
+}
+
+/* ---------- Not for this look ---------- */
+body[data-theme="cyberpunk"] :is(.bartkiLayer, .bartkiFlash) {
+  display: none;
+}
+
+body[data-theme="cyberpunk"] .bartekTopics button[aria-pressed="true"] {
+  color: var(--primary-dark);
+}
+
+@media (max-width: 760px) {
+  body[data-theme="cyberpunk"] .appHeader h1 { font-size: 22px; }
+  body[data-theme="cyberpunk"] .panel { clip-path: none; }
+  body[data-theme="cyberpunk"] .panel::after { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme="cyberpunk"]::after,
+  body[data-theme="cyberpunk"] .appHeader h1,
+  body[data-theme="cyberpunk"] .tabView.isActive,
+  body[data-theme="cyberpunk"] .meterFill,
+  body[data-theme="cyberpunk"] .dayCard.isFocused,
+  body[data-theme="cyberpunk"] #addWorklogDlg.worklogDrawer[open],
+  body[data-theme="cyberpunk"] .appPrompt[open],
+  body[data-theme="cyberpunk"] .workspaceToast {
+    animation: none;
+  }
+  body[data-theme="cyberpunk"]::after { display: none; }
+  body[data-theme="cyberpunk"] .primaryBtn::after,
+  body[data-theme="cyberpunk"] .periodTimeProgress > span { transition: none; }
+}

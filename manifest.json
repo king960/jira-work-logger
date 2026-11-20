@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Jira Worklogs Range",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "action": {
     "default_popup": "popup.html",
     "default_title": "Jira Worklogs",
@@ -16,12 +16,7 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": [
-    "storage",
-    "tabs",
-    "alarms",
-    "notifications"
-  ],
+  "permissions": ["storage", "tabs", "alarms", "notifications"],
   "host_permissions": [
     "https://*.atlassian.net/*",
     "http://127.0.0.1/*",
@@ -30,13 +25,8 @@
   ],
   "content_scripts": [
     {
-      "matches": [
-        "https://*.atlassian.net/*"
-      ],
-      "js": [
-        "jira-page-panel.js",
-        "rovo-handoff.js"
-      ],
+      "matches": ["https://*.atlassian.net/*"],
+      "js": ["jira-page-panel.js", "rovo-handoff.js"],
       "run_at": "document_idle",
       "all_frames": false
     }
